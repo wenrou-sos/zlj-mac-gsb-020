@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+backend/.venv/
+backend/.pytest_cache/
+backend/watergrid.db
+backend/*.db
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Runtime
+.run/
+*.log

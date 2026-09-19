@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: watergrid-db
+    environment:
+      POSTGRES_USER: watergrid
+      POSTGRES_PASSWORD: watergrid_pwd
+      POSTGRES_DB: watergrid
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watergrid -d watergrid"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  backend:
+    build: ./backend
+    container_name: watergrid-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://watergrid:watergrid_pwd@db:5432/watergrid
+      SEED_ON_STARTUP: "true"
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: watergrid-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
